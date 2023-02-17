@@ -56,9 +56,7 @@ class TimeFst(GraphFst):
         delete_minute_suffix = delete_space + insert_space + pynutil.delete("min")
         delete_second_suffix = delete_space + insert_space + pynutil.delete("s")
 
-        labels_hour_24 = [
-            str(x) for x in range(0, 25)
-        ]  # Can see both systems. Twelve hour requires am/pm for ambiguity resolution
+        labels_hour_24 = [str(x) for x in range(25)]
         labels_hour_12 = [str(x) for x in range(1, 13)]
         labels_minute_single = [str(x) for x in range(1, 10)]
         labels_minute_double = [str(x) for x in range(10, 60)]

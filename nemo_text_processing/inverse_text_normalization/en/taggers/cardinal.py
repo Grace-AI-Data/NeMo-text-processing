@@ -212,7 +212,7 @@ class CardinalFst(GraphFst):
             pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT), "0"
         )
 
-        labels_exception = [num_to_word(x) for x in range(0, 13)]
+        labels_exception = [num_to_word(x) for x in range(13)]
 
         if input_case == INPUT_CASED:
             labels_exception += [x.capitalize() for x in labels_exception]

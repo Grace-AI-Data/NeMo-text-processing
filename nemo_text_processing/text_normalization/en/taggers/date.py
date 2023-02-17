@@ -103,14 +103,15 @@ def get_four_digit_year_graph(deterministic: bool = True):
 
 
 def _get_two_digit_year_with_s_graph():
-    # to handle '70s -> seventies
-    graph = (
+    return (
         pynini.closure(pynutil.delete("'"), 0, 1)
         + pynini.compose(
-            ties_graph + pynutil.delete("0s"), pynini.cdrewrite(pynini.cross("y", "ies"), "", "[EOS]", NEMO_SIGMA)
+            ties_graph + pynutil.delete("0s"),
+            pynini.cdrewrite(
+                pynini.cross("y", "ies"), "", "[EOS]", NEMO_SIGMA
+            ),
         )
     ).optimize()
-    return graph
 
 
 def _get_year_graph(cardinal_graph, deterministic: bool = True):
@@ -138,8 +139,9 @@ def _get_year_graph(cardinal_graph, deterministic: bool = True):
 
 
 def _get_two_digit_year(cardinal_graph, single_digits_graph):
-    two_digit_year = NEMO_DIGIT ** (2) @ plurals._priority_union(cardinal_graph, single_digits_graph, NEMO_SIGMA)
-    return two_digit_year
+    return NEMO_DIGIT ** (2) @ plurals._priority_union(
+        cardinal_graph, single_digits_graph, NEMO_SIGMA
+    )
 
 
 def _get_financial_period_graph():
@@ -151,9 +153,7 @@ def _get_financial_period_graph():
 
     h_graph = h_ordinals + pynini.cross('H', ' half')
     q_graph = q_ordinals + pynini.cross('Q', ' quarter')
-    period_graph = h_graph | q_graph
-
-    return period_graph
+    return h_graph | q_graph
 
 
 class DateFst(GraphFst):

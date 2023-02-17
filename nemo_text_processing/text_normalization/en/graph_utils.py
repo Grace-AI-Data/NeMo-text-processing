@@ -170,7 +170,7 @@ class GraphFst:
         self._fst = None
         self.deterministic = deterministic
 
-        self.far_path = Path(os.path.dirname(__file__) + '/grammars/' + kind + '/' + name + '.far')
+        self.far_path = Path(f'{os.path.dirname(__file__)}/grammars/{kind}/{name}.far')
         if self.far_exist():
             self._fst = Far(self.far_path, mode="r", arc_type="standard", far_type="default").get_fst()
 

@@ -76,9 +76,9 @@ def threshold_weights(norm_texts_weights, delta: float = 0.2):
     """
     # threshold value is factor applied to lowest/first weight of all normalization options for every input
     res = []
-    for i, options_weights in enumerate(norm_texts_weights):
+    for options_weights in norm_texts_weights:
         thresh = options_weights[1][0] + delta  # minimum weight plus delta
-        item = [x for x in zip(*options_weights)]
+        item = list(zip(*options_weights))
         # filters out all options for every input that is larger than threshold
         res.append(list(filter(lambda x: x[1] < thresh, item)))
 
@@ -100,13 +100,12 @@ def _get_unchanged_count(text):
     end_pattern = ">"
 
     text = utils.remove_punctuation(text, remove_spaces=False, do_lower=False, exclude=exclude)
-    text_clean = ""
-    for ch in text:
-        if ch.isalpha() or ch.isspace() or ch in [start_pattern, end_pattern]:
-            text_clean += ch
-        else:
-            text_clean += " " + ch + " "
-
+    text_clean = "".join(
+        ch
+        if ch.isalpha() or ch.isspace() or ch in [start_pattern, end_pattern]
+        else " " + ch + " "
+        for ch in text
+    )
     text = text_clean
     unchanged_count = 0
     skip = False
@@ -313,7 +312,7 @@ def main():
         for i in examples_with_no_labels_among_wfst:
             print(f"INPUT: {pre_inputs[i]}")
             print(f"GT   : {post_targets[i]}\n")
-            print(f"WFST:")
+            print("WFST:")
             for x in post_norm_texts_weights[i]:
                 print(x)
             print("=" * 40)

@@ -63,26 +63,26 @@ def pytest_addoption(parser):
 @pytest.fixture
 def device(request):
     """ Simple fixture returning string denoting the device [CPU | GPU] """
-    if request.config.getoption("--cpu"):
-        return "CPU"
-    else:
-        return "GPU"
+    return "CPU" if request.config.getoption("--cpu") else "GPU"
 
 
 @pytest.fixture(autouse=True)
 def run_only_on_device_fixture(request, device):
-    if request.node.get_closest_marker('run_only_on'):
-        if request.node.get_closest_marker('run_only_on').args[0] != device:
-            pytest.skip('skipped on this device: {}'.format(device))
+    if (
+        request.node.get_closest_marker('run_only_on')
+        and request.node.get_closest_marker('run_only_on').args[0] != device
+    ):
+        pytest.skip(f'skipped on this device: {device}')
 
 
 @pytest.fixture(autouse=True)
 def downloads_weights(request, device):
-    if request.node.get_closest_marker('with_downloads'):
-        if not request.config.getoption("--with_downloads"):
-            pytest.skip(
-                'To run this test, pass --with_downloads option. It will download (and cache) models from cloud.'
-            )
+    if request.node.get_closest_marker(
+        'with_downloads'
+    ) and not request.config.getoption("--with_downloads"):
+        pytest.skip(
+            'To run this test, pass --with_downloads option. It will download (and cache) models from cloud.'
+        )
 
 
 @pytest.fixture(autouse=True)
@@ -105,9 +105,7 @@ def cleanup_local_folder():
 @pytest.fixture
 def test_data_dir():
     """ Fixture returns test_data_dir. """
-    # Test dir.
-    test_data_dir_ = join(dirname(__file__), __TEST_DATA_SUBDIR)
-    return test_data_dir_
+    return join(dirname(__file__), __TEST_DATA_SUBDIR)
 
 
 def extract_data_from_tar(test_dir, test_data_archive, url=None, local_data=False):
@@ -134,7 +132,7 @@ def extract_data_from_tar(test_dir, test_data_archive, url=None, local_data=Fals
         urllib.request.urlretrieve(url, test_data_archive)
 
     # Extract tar
-    print("Extracting the `{}` test archive, please wait...".format(test_data_archive))
+    print(f"Extracting the `{test_data_archive}` test archive, please wait...")
     tar = tarfile.open(test_data_archive)
     tar.extractall(path=test_dir)
     tar.close()
@@ -166,12 +164,10 @@ def pytest_configure(config):
 
     if config.option.use_local_test_data:
         if test_data_local_size == -1:
-            pytest.exit("Test data `{}` is not present in the system".format(test_data_archive))
+            pytest.exit(f"Test data `{test_data_archive}` is not present in the system")
         else:
             print(
-                "Using the local `{}` test archive ({}B) found in the `{}` folder.".format(
-                    __TEST_DATA_FILENAME, test_data_local_size, test_dir
-                )
+                f"Using the local `{__TEST_DATA_FILENAME}` test archive ({test_data_local_size}B) found in the `{test_dir}` folder."
             )
 
     # Get size of remote test_data archive.
@@ -183,12 +179,12 @@ def pytest_configure(config):
         except:
             # Couldn't access remote archive.
             if test_data_local_size == -1:
-                pytest.exit("Test data not present in the system and cannot access the '{}' URL".format(url))
+                pytest.exit(
+                    f"Test data not present in the system and cannot access the '{url}' URL"
+                )
             else:
                 print(
-                    "Cannot access the '{}' URL, using the test data ({}B) found in the `{}` folder.".format(
-                        url, test_data_local_size, test_dir
-                    )
+                    f"Cannot access the '{url}' URL, using the test data ({test_data_local_size}B) found in the `{test_dir}` folder."
                 )
                 return
 
@@ -199,18 +195,14 @@ def pytest_configure(config):
         # Compare sizes.
         if test_data_local_size != test_data_remote_size:
             print(
-                "Downloading the `{}` test archive from `{}`, please wait...".format(
-                    __TEST_DATA_FILENAME, __TEST_DATA_URL
-                )
+                f"Downloading the `{__TEST_DATA_FILENAME}` test archive from `{__TEST_DATA_URL}`, please wait..."
             )
 
             extract_data_from_tar(test_dir, test_data_archive, url=url, local_data=config.option.use_local_test_data)
 
         else:
             print(
-                "A valid `{}` test archive ({}B) found in the `{}` folder.".format(
-                    __TEST_DATA_FILENAME, test_data_local_size, test_dir
-                )
+                f"A valid `{__TEST_DATA_FILENAME}` test archive ({test_data_local_size}B) found in the `{test_dir}` folder."
             )
 
     else:

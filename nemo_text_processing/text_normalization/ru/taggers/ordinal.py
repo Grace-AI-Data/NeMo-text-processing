@@ -48,7 +48,9 @@ class OrdinalFst(GraphFst):
         # to handle cases like 2-ая
         endings = pynini.string_file(get_abs_path("data/numbers/ordinal_endings.tsv"))
         not_dash = pynini.closure(pynini.difference(NEMO_SIGMA, "-"))
-        del_ending = pynini.cdrewrite(pynini.cross("-" + not_dash, ""), "", "[EOS]", NEMO_SIGMA)
+        del_ending = pynini.cdrewrite(
+            pynini.cross(f"-{not_dash}", ""), "", "[EOS]", NEMO_SIGMA
+        )
         ordinal_numbers_marked = (
             ((separators @ ordinal).optimize() + pynini.accep("-") + not_dash).optimize()
             @ (NEMO_SIGMA + endings).optimize()

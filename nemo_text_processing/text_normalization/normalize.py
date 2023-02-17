@@ -104,7 +104,7 @@ class Normalizer:
         post_process: bool = True,
         max_number_of_permutations_per_split: int = 729,
     ):
-        assert input_case in ["lower_cased", "cased"]
+        assert input_case in {"lower_cased", "cased"}
 
         self.post_processor = None
 
@@ -117,13 +117,12 @@ class Normalizer:
 
             if deterministic:
                 from nemo_text_processing.text_normalization.en.taggers.tokenize_and_classify import ClassifyFst
+            elif lm:
+                from nemo_text_processing.text_normalization.en.taggers.tokenize_and_classify_lm import ClassifyFst
             else:
-                if lm:
-                    from nemo_text_processing.text_normalization.en.taggers.tokenize_and_classify_lm import ClassifyFst
-                else:
-                    from nemo_text_processing.text_normalization.en.taggers.tokenize_and_classify_with_audio import (
-                        ClassifyFst,
-                    )
+                from nemo_text_processing.text_normalization.en.taggers.tokenize_and_classify_with_audio import (
+                    ClassifyFst,
+                )
         elif lang == 'ru':
             # Ru TN only support non-deterministic cases and produces multiple normalization options
             # use normalize_with_audio.py
@@ -228,7 +227,7 @@ class Normalizer:
         self, token_group: Dict[str, Union[OrderedDict, str, bool]]
     ) -> int:
         num_perms = 1
-        for k, inner in token_group.items():
+        for inner in token_group.values():
             if isinstance(inner, dict):
                 num_perms *= self._estimate_number_of_permutations_in_nested_dict(inner)
         num_perms *= factorial(len(token_group))
@@ -284,7 +283,7 @@ class Normalizer:
                 )
             current_number_of_permutations *= n
         splits.append(tokens[prev_end_of_split:])
-        assert sum([len(s) for s in splits]) == len(tokens)
+        assert sum(len(s) for s in splits) == len(tokens)
         return splits
 
     def normalize(
@@ -335,7 +334,7 @@ class Normalizer:
                     break
             if verbalizer_lattice is None:
                 raise ValueError(f"No permutations were generated from tokens {s}")
-            output += ' ' + Normalizer.select_verbalizer(verbalizer_lattice)
+            output += f' {Normalizer.select_verbalizer(verbalizer_lattice)}'
         output = SPACE_DUP.sub(' ', output[1:])
 
         if self.lang == "en" and hasattr(self, 'post_processor'):
@@ -506,7 +505,10 @@ class Normalizer:
         text = re.sub(r" +", " ", text)
 
         # remove space in the middle of the lower case abbreviation to avoid splitting into separate sentences
-        matches = re.findall(r"[a-z" + lower_case_unicode + "]\.\s[a-z" + lower_case_unicode + "]\.", text)
+        matches = re.findall(
+            f"[a-z{lower_case_unicode}" + "]\.\s[a-z" + lower_case_unicode + "]\.",
+            text,
+        )
         for match in matches:
             text = text.replace(match, match.replace(". ", "."))
 
@@ -537,7 +539,12 @@ class Normalizer:
                     subl = ["".join(x) for x in itertools.product(subl, [f"{k}: \"{v}\" "])]
                 elif isinstance(v, OrderedDict):
                     rec = self._permute(v)
-                    subl = ["".join(x) for x in itertools.product(subl, [f" {k} {{ "], rec, [f" }} "])]
+                    subl = [
+                        "".join(x)
+                        for x in itertools.product(
+                            subl, [f" {k} {{ "], rec, [" }} "]
+                        )
+                    ]
                 elif isinstance(v, bool):
                     subl = ["".join(x) for x in itertools.product(subl, [f"{k}: true "])]
                 else:
@@ -584,8 +591,7 @@ class Normalizer:
 
         Returns: tagged lattice
         """
-        lattice = text @ self.tagger.fst
-        return lattice
+        return text @ self.tagger.fst
 
     @staticmethod
     def select_tag(lattice: 'pynini.FstLike') -> str:
@@ -597,8 +603,7 @@ class Normalizer:
 
         Returns: shortest path
         """
-        tagged_text = pynini.shortestpath(lattice, nshortest=1, unique=True).string()
-        return tagged_text
+        return pynini.shortestpath(lattice, nshortest=1, unique=True).string()
 
     def find_verbalizer(self, tagged_text: str) -> 'pynini.FstLike':
         """
@@ -610,8 +615,7 @@ class Normalizer:
 
         Returns: verbalized lattice
         """
-        lattice = tagged_text @ self.verbalizer.fst
-        return lattice
+        return tagged_text @ self.verbalizer.fst
 
     @staticmethod
     def select_verbalizer(lattice: 'pynini.FstLike') -> str:
@@ -623,10 +627,7 @@ class Normalizer:
 
         Returns: shortest path
         """
-        output = pynini.shortestpath(lattice, nshortest=1, unique=True).string()
-        # lattice = output @ self.verbalizer.punct_graph
-        # output = pynini.shortestpath(lattice, nshortest=1, unique=True).string()
-        return output
+        return pynini.shortestpath(lattice, nshortest=1, unique=True).string()
 
     def post_process(self, normalized_text: 'pynini.FstLike') -> str:
         """
@@ -751,10 +752,10 @@ if __name__ == "__main__":
             )
 
         else:
-            print("Loading data: " + args.input_file)
+            print(f"Loading data: {args.input_file}")
             data = load_file(args.input_file)
 
-            print("- Data: " + str(len(data)) + " sentences")
+            print(f"- Data: {len(data)} sentences")
             normalizer_prediction = normalizer.normalize_list(
                 data,
                 verbose=args.verbose,

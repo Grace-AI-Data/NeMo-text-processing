@@ -31,7 +31,7 @@ def num_to_word(x: Union[str, int]):
     """
     if isinstance(x, int):
         x = str(x)
-        x = _inflect.number_to_words(str(x)).replace("-", " ").replace(",", "")
+        x = _inflect.number_to_words(x).replace("-", " ").replace(",", "")
     return x
 
 
@@ -44,4 +44,4 @@ def get_abs_path(rel_path):
         
     Returns absolute path
     """
-    return os.path.dirname(os.path.abspath(__file__)) + '/' + rel_path
+    return f'{os.path.dirname(os.path.abspath(__file__))}/{rel_path}'

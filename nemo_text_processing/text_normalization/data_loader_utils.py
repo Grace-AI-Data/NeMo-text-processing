@@ -111,8 +111,7 @@ def clean_generic(text: str) -> str:
     Returns: cleaned string
     """
     text = text.strip()
-    text = text.lower()
-    return text
+    return text.lower()
 
 
 def evaluate(preds: List[str], labels: List[str], input: Optional[List[str]] = None, verbose: bool = True) -> float:
@@ -156,10 +155,11 @@ def training_data_to_tokens(
     """
     result = defaultdict(lambda: ([], []))
     for instance in data:
-        if instance.token_type != EOS_TYPE:
-            if category is None or instance.token_type == category:
-                result[instance.token_type][0].append(instance.un_normalized)
-                result[instance.token_type][1].append(instance.normalized)
+        if instance.token_type != EOS_TYPE and (
+            category is None or instance.token_type == category
+        ):
+            result[instance.token_type][0].append(instance.un_normalized)
+            result[instance.token_type][1].append(instance.normalized)
     return result
 
 
@@ -237,7 +237,7 @@ def pre_process(text: str) -> str:
     """
     space_both = '[]'
     for punct in space_both:
-        text = text.replace(punct, ' ' + punct + ' ')
+        text = text.replace(punct, f' {punct} ')
 
     # remove extra space
     text = re.sub(r' +', ' ', text)
@@ -255,8 +255,7 @@ def load_file(file_path: str) -> List[str]:
     """
     res = []
     with open(file_path, 'r') as fp:
-        for line in fp:
-            res.append(line)
+        res.extend(iter(fp))
     return res
 
 
@@ -295,8 +294,8 @@ def post_process_punct(input: str, normalized_text: str, add_unicode_punct: bool
     # to make sure these new double quotes work with this function
     if "``" in input and "``" not in normalized_text:
         input = input.replace("``", '"')
-    input = [x for x in input]
-    normalized_text = [x for x in normalized_text]
+    input = list(input)
+    normalized_text = list(normalized_text)
     punct_marks = [x for x in string.punctuation if x in input]
 
     if add_unicode_punct:
@@ -340,7 +339,7 @@ def post_process_punct(input: str, normalized_text: str, add_unicode_punct: bool
                     if normalized_text[idx_out + 1] == " " and input[idx_in + 1] != " ":
                         normalized_text[idx_out + 1] = ""
                     elif normalized_text[idx_out + 1] != " " and input[idx_in + 1] == " ":
-                        normalized_text[idx_out] = normalized_text[idx_out] + " "
+                        normalized_text[idx_out] = f"{normalized_text[idx_out]} "
                 idx_out += 1
                 idx_in += 1
         except:

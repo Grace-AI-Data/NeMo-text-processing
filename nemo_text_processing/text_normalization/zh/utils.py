@@ -29,7 +29,7 @@ def get_abs_path(rel_path):
         
     Returns absolute path
     """
-    return os.path.dirname(os.path.abspath(__file__)) + '/' + rel_path
+    return f'{os.path.dirname(os.path.abspath(__file__))}/{rel_path}'
 
 
 def load_labels(abs_path):
@@ -42,8 +42,7 @@ def load_labels(abs_path):
     Returns dictionary of mappings
     """
     label_tsv = open(abs_path, encoding="utf-8")
-    labels = list(csv.reader(label_tsv, delimiter="\t"))
-    return labels
+    return list(csv.reader(label_tsv, delimiter="\t"))
 
 
 def augment_labels_with_punct_at_end(labels):
@@ -56,9 +55,8 @@ def augment_labels_with_punct_at_end(labels):
     Returns:
         additional labels
     """
-    res = []
-    for label in labels:
-        if len(label) > 1:
-            if label[0][-1] == "." and label[1][-1] != ".":
-                res.append([label[0], label[1] + "."] + label[2:])
-    return res
+    return [
+        [label[0], f"{label[1]}."] + label[2:]
+        for label in labels
+        if len(label) > 1 and label[0][-1] == "." and label[1][-1] != "."
+    ]

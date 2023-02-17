@@ -75,7 +75,7 @@ def _get_ambiguous_positions(sentences: List[str]):
     """returns None or index list of ambigous semiotic tokens for list of sentences.
     E.g. if sentences = ["< street > < three > A", "< saint > < three > A"], it returns [1, 0] since only 
     the first semiotic span <street>/<saint> is ambiguous."""
-    l_sets = [set([x]) for x in re.findall("<\s.+?\s>", sentences[0])]
+    l_sets = [{x} for x in re.findall("<\s.+?\s>", sentences[0])]
     for sentence in sentences[1:]:
         spans = re.findall("<\s.+?\s>", sentence)
         if len(spans) != len(l_sets):
@@ -83,10 +83,7 @@ def _get_ambiguous_positions(sentences: List[str]):
         for i in range(len(spans)):
             l_sets[i].add(spans[i])
 
-    ambiguous = []
-    for span in l_sets:
-        ambiguous.append(len(span) > 1)
-    return ambiguous
+    return [len(span) > 1 for span in l_sets]
 
 
 def score_options(sentences: List[str], context_len, model, do_lower=True):
@@ -94,7 +91,7 @@ def score_options(sentences: List[str], context_len, model, do_lower=True):
     scores = []
     if context_len is not None:
         diffs = [find_diff(s, context_len) for s in sentences]
-        if len(set([len(d) for d in diffs])) == 1:
+        if len({len(d) for d in diffs}) == 1:
             sentences = diffs
 
     ambiguous_positions = None
@@ -139,23 +136,23 @@ def find_diff(text, context_len=3):
 
     index_start = 0
     while pattern_start in text[index_start:]:
-        index_start = index_start + text[index_start:].index(pattern_start)
+        index_start += text[index_start:].index(pattern_start)
         offset = index_start
         if pattern_end in text[offset:]:
             index_end = offset + text[offset:].index(pattern_end) + len(pattern_end)
             center = __clean(text[index_start:index_end])
 
             left_context = " ".join(__clean(text[:index_start]).split()[-context_len:])
-            if len(left_context) > 0 and text[:index_start][-1].isspace():
-                left_context = left_context + " "
+            if left_context != "" and text[:index_start][-1].isspace():
+                left_context += " "
             right_context = " ".join(__clean(text[index_end:]).split()[:context_len])
-            if len(right_context) > 0 and text[index_end][0].isspace():
-                right_context = " " + right_context
+            if right_context != "" and text[index_end][0].isspace():
+                right_context = f" {right_context}"
             diffs.append(left_context + center + right_context)
             index_end += 1
             index_start = index_end + 1
         else:
             break
-    if len(diffs) == 0:
+    if not diffs:
         diffs = [text]
     return diffs

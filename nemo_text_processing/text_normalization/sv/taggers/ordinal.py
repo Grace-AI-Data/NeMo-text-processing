@@ -70,9 +70,8 @@ class OrdinalFst(GraphFst):
             | pynini.union("1", "2")
         ) + pynutil.delete(pynini.union(":a", ":A"))
         e_format = pynini.closure(
-            (NEMO_DIGIT - "1" - "2")
-            | (cardinal_format + "1" + NEMO_DIGIT)
-            | (cardinal_format + (NEMO_DIGIT - "1") + (NEMO_DIGIT - "1" - "2")),
+            (NEMO_DIGIT - "1" - "2" | f"{cardinal_format}1{NEMO_DIGIT}")
+            | cardinal_format + (NEMO_DIGIT - "1") + (NEMO_DIGIT - "1" - "2"),
             1,
         ) + pynutil.delete(pynini.union(":e", ":E"))
 

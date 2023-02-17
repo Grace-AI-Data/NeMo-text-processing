@@ -46,10 +46,7 @@ def get_quantity(
         + (quantity_wo_thousand @ (quantities | quantities_abbr))
         + pynutil.insert("\"")
     )
-    if include_abbr:
-        quantity = quantities | quantities_abbr
-    else:
-        quantity = quantities
+    quantity = quantities | quantities_abbr if include_abbr else quantities
     res |= (
         decimal
         + pynini.closure(pynutil.delete(" "), 0, 1)
@@ -107,8 +104,10 @@ class DecimalFst(GraphFst):
         if not deterministic:
             no_oh_zero = pynini.difference(
                 NEMO_SIGMA,
-                (NEMO_SIGMA + "oh" + NEMO_SIGMA + "zero" + NEMO_SIGMA)
-                | (NEMO_SIGMA + "zero" + NEMO_SIGMA + "oh" + NEMO_SIGMA),
+                (
+                    f"{NEMO_SIGMA}oh{NEMO_SIGMA}zero{NEMO_SIGMA}"
+                    | f"{NEMO_SIGMA}zero{NEMO_SIGMA}oh{NEMO_SIGMA}"
+                ),
             ).optimize()
             no_zero_oh = pynini.difference(
                 NEMO_SIGMA, NEMO_SIGMA + pynini.accep("zero") + NEMO_SIGMA + pynini.accep("oh") + NEMO_SIGMA

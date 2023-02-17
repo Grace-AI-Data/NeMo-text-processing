@@ -58,7 +58,7 @@ if __name__ == "__main__":
     file_path = args.input
     normalizer = Normalizer(input_case=args.input_case, lang=args.lang)
 
-    print("Loading training data: " + file_path)
+    print(f"Loading training data: {file_path}")
     training_data = load_files([file_path])
 
     if args.filter:
@@ -67,39 +67,41 @@ if __name__ == "__main__":
     if args.category is None:
         print("Sentence level evaluation...")
         sentences_un_normalized, sentences_normalized, _ = training_data_to_sentences(training_data)
-        print("- Data: " + str(len(sentences_normalized)) + " sentences")
+        print(f"- Data: {len(sentences_normalized)} sentences")
         sentences_prediction = normalizer.normalize_list(sentences_un_normalized)
         print("- Normalized. Evaluating...")
         sentences_accuracy = evaluate(
             preds=sentences_prediction, labels=sentences_normalized, input=sentences_un_normalized
         )
-        print("- Accuracy: " + str(sentences_accuracy))
+        print(f"- Accuracy: {str(sentences_accuracy)}")
 
     print("Token level evaluation...")
     tokens_per_type = training_data_to_tokens(training_data, category=args.category)
     token_accuracy = {}
     for token_type in tokens_per_type:
-        print("- Token type: " + token_type)
+        print(f"- Token type: {token_type}")
         tokens_un_normalized, tokens_normalized = tokens_per_type[token_type]
-        print("  - Data: " + str(len(tokens_normalized)) + " tokens")
+        print(f"  - Data: {len(tokens_normalized)} tokens")
         tokens_prediction = normalizer.normalize_list(tokens_un_normalized)
         print("  - Denormalized. Evaluating...")
         token_accuracy[token_type] = evaluate(
             preds=tokens_prediction, labels=tokens_normalized, input=tokens_un_normalized
         )
-        print("  - Accuracy: " + str(token_accuracy[token_type]))
+        print(f"  - Accuracy: {str(token_accuracy[token_type])}")
     token_count_per_type = {token_type: len(tokens_per_type[token_type][0]) for token_type in tokens_per_type}
     token_weighted_accuracy = [
         token_count_per_type[token_type] * accuracy for token_type, accuracy in token_accuracy.items()
     ]
-    print("- Accuracy: " + str(sum(token_weighted_accuracy) / sum(token_count_per_type.values())))
-    print(" - Total: " + str(sum(token_count_per_type.values())), '\n')
+    print(
+        f"- Accuracy: {str(sum(token_weighted_accuracy) / sum(token_count_per_type.values()))}"
+    )
+    print(f" - Total: {str(sum(token_count_per_type.values()))}", '\n')
 
-    print(" - Total: " + str(sum(token_count_per_type.values())), '\n')
+    print(f" - Total: {str(sum(token_count_per_type.values()))}", '\n')
 
     for token_type in token_accuracy:
         if token_type not in known_types:
-            raise ValueError("Unexpected token type: " + token_type)
+            raise ValueError(f"Unexpected token type: {token_type}")
 
     if args.category is None:
         c1 = ['Class', 'sent level'] + known_types
@@ -107,7 +109,7 @@ if __name__ == "__main__":
             token_count_per_type[known_type] if known_type in tokens_per_type else '0' for known_type in known_types
         ]
         c3 = ['Normalization', sentences_accuracy] + [
-            token_accuracy[known_type] if known_type in token_accuracy else '0' for known_type in known_types
+            token_accuracy.get(known_type, '0') for known_type in known_types
         ]
 
         for i in range(len(c1)):

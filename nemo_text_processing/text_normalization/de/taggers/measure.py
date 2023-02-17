@@ -44,11 +44,9 @@ def singular_to_plural():
     _e = NEMO_SIGMA + pynini.union("eur", "ich", "ier", "ig", "ling", "ör") + pynutil.insert("e")
     _s = NEMO_SIGMA + pynini.union("a", "i", "o", "u", "y") + pynutil.insert("s")
 
-    graph_plural = plurals._priority_union(
+    return plurals._priority_union(
         suppletive, pynini.union(_n, _en, _nen, _fremd, _e, _s), NEMO_SIGMA
     ).optimize()
-
-    return graph_plural
 
 
 class MeasureFst(GraphFst):

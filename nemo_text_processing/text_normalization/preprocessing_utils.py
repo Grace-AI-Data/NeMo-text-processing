@@ -28,8 +28,11 @@ def _split(sentences: List[str], delimiter: str, max_len: int, min_len: int):
             comb = []
             for s in split_sent:
                 # if the previous sentence is too short, combine it with the current sentence
-                if len(comb) > 0 and (len(comb[-1].split()) <= min_len or len(s.split()) <= min_len):
-                    comb[-1] = comb[-1] + " " + s
+                if comb and (
+                    len(comb[-1].split()) <= min_len
+                    or len(s.split()) <= min_len
+                ):
+                    comb[-1] = f"{comb[-1]} {s}"
                 else:
                     comb.append(s)
             result.extend(comb)
@@ -50,7 +53,7 @@ def additional_split(sentences: List[str], split_on_symbols: str, max_len: int =
         max_len: the maximum number of symbols in the output sentences (the result will be the closest len match)
         min_len: the minimum number of the output sentences (the result will be the closest len match)
     """
-    if len(split_on_symbols) == 0:
+    if not split_on_symbols:
         return sentences
 
     split_on_symbols = split_on_symbols.split("|")
@@ -62,7 +65,10 @@ def additional_split(sentences: List[str], split_on_symbols: str, max_len: int =
             if len(delimiter) == 0:
                 continue
             split_sent = _split(
-                split_sent, delimiter + " " if delimiter != " " else delimiter, max_len=max_len, min_len=min_len
+                split_sent,
+                f"{delimiter} " if delimiter != " " else delimiter,
+                max_len=max_len,
+                min_len=min_len,
             )
         another_sent_split.extend(split_sent)
 

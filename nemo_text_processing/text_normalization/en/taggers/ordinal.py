@@ -50,9 +50,10 @@ class OrdinalFst(GraphFst):
             + pynutil.delete(pynini.union("rd", "RD", "ʳᵈ"))
         )
         th_format = pynini.closure(
-            (NEMO_DIGIT - "1" - "2" - "3")
-            | (cardinal_format + "1" + NEMO_DIGIT)
-            | (cardinal_format + (NEMO_DIGIT - "1") + (NEMO_DIGIT - "1" - "2" - "3")),
+            (NEMO_DIGIT - "1" - "2" - "3" | f"{cardinal_format}1{NEMO_DIGIT}")
+            | cardinal_format
+            + (NEMO_DIGIT - "1")
+            + (NEMO_DIGIT - "1" - "2" - "3"),
             1,
         ) + pynutil.delete(pynini.union("th", "TH", "ᵗʰ"))
         self.graph = (st_format | nd_format | rd_format | th_format) @ cardinal_graph

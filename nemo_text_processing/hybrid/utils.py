@@ -110,9 +110,9 @@ def _clean_pre_norm_libritts(inputs: List[str], targets: List[List[str]]):
     standardizes format of inputs and targets before being normalized, so more rules apply.
     This is specific for libritts.
     """
-    for i in range(len(targets)):
-        for j in range(len(targets[i])):
-            targets[i][j] = clean_libri_tts(targets[i][j])
+    for target_ in targets:
+        for j in range(len(target_)):
+            target_[j] = clean_libri_tts(target_[j])
 
     for i in range(len(inputs)):
         for target in targets[i]:
@@ -183,9 +183,6 @@ def clean_pre_norm(inputs: List[str], targets: List[List[str]], dataset: Optiona
         pre_inputs, pre_targets = _clean_pre_norm_libritts(inputs=pre_inputs, targets=pre_targets)
     elif dataset == "google":
         pre_inputs, pre_targets = _clean_pre_norm_google(inputs=pre_inputs, targets=pre_targets)
-    else:
-        pass
-
     # --- general pre cleaning ---
     for i in range(len(pre_inputs)):
         pre_inputs[i] = re.sub("librivox.org", "librivox dot org", pre_inputs[i])
@@ -223,37 +220,36 @@ def _clean_post_general(str) -> str:
     """
     standardizes format of inputs and targets, and predicted normalizations for easier evaluation.
     """
-    str = re.sub(rf" oh ", " zero ", str)
-    str = re.sub(rf" oh$", " zero", str)
-    str = re.sub(rf"^oh ", "zero ", str)
+    str = re.sub(" oh ", " zero ", str)
+    str = re.sub(" oh$", " zero", str)
+    str = re.sub("^oh ", "zero ", str)
     # str = re.sub(rf" o ", " zero ", str)
     str = re.sub(rf"\sO\b", "zero", str)
-    str = re.sub(rf" o$", " zero", str)
-    str = re.sub(rf"^o ", "zero ", str)
-    str = re.sub(rf"'o ", "'zero ", str)
+    str = re.sub(" o$", " zero", str)
+    str = re.sub("^o ", "zero ", str)
+    str = re.sub("'o ", "'zero ", str)
     str = str.replace("mountain", "mount")
     return str
 
 
 def _clean_targets(str) -> str:
     """Clean ground truth options."""
-    str = re.sub(rf" o ", " zero ", str)
-    return str
+    return re.sub(" o ", " zero ", str)
 
 
 def adjust_pred(pred: str, gt: str, dataset: str, delim_present=True):
     """Standardize prediction format to make evaluation easier"""
     orig_pred = pred
     orig_gt = gt
-    if delim_present and not re.search(rf"< (.*?) >", pred):
+    if delim_present and not re.search("< (.*?) >", pred):
         return pred
-    pred = re.sub(rf"< ", "", pred)
-    pred = re.sub(rf" >", "", pred)
+    pred = re.sub("< ", "", pred)
+    pred = re.sub(" >", "", pred)
     pred = pred.lower().strip()
     gt = gt.lower().strip()
     can_be_adjusted = False
 
-    if dataset in ["google", "libritts"] and pred != gt:
+    if dataset in {"google", "libritts"} and pred != gt:
         if is_date(pred=pred, gt=gt, cardinal_graph=cardinal_graph):
             pred = gt
         elif contains_month(pred, gt):
@@ -261,8 +257,8 @@ def adjust_pred(pred: str, gt: str, dataset: str, delim_present=True):
             gt = re.sub(r",", "", gt)
             pred = re.sub(r" zero ", " o ", pred)
             gt = re.sub(r" zero ", " o ", gt)
-            gt = re.sub(rf" +", " ", gt)
-            pred = re.sub(rf" +", " ", pred)
+            gt = re.sub(" +", " ", gt)
+            pred = re.sub(" +", " ", pred)
 
         if pred != gt:
             gt_itn = inverse_normalizer.normalize(gt, verbose=False)
@@ -288,7 +284,7 @@ def adjust_pred(pred: str, gt: str, dataset: str, delim_present=True):
             gt = re.sub(rf"\bmrs\b", "misses", gt)
             gt = re.sub(rf"\bdr\b", "doctor", gt)
             gt = re.sub(rf"\bco\b", "company", gt)
-    if gt != pd and dataset in ["google", "libritts"]:
+    if gt != pd and dataset in {"google", "libritts"}:
         if gt.replace("/", "").replace("  ", " ") == pred.replace("slash", "").replace("  ", " "):
             pred = gt
         elif gt in ["s", "z"] and pred in ["s", "z"]:
@@ -302,17 +298,13 @@ def adjust_pred(pred: str, gt: str, dataset: str, delim_present=True):
         elif gt.replace("to", "").replace("-", "") == pred.replace("to", "").replace("-", ""):
             pred = gt
 
-    gt = re.sub(rf" +", " ", gt)
+    gt = re.sub(" +", " ", gt)
     pred = re.sub(rf"(\.)", "", pred)
-    pred = re.sub(rf" +", " ", pred)
+    pred = re.sub(" +", " ", pred)
     if gt == pred:
         can_be_adjusted = True
     if can_be_adjusted:
-        if delim_present:
-            res = f" < {orig_gt} > "
-        else:
-            res = orig_gt
-        return res
+        return f" < {orig_gt} > " if delim_present else orig_gt
     else:
         return orig_pred
 
@@ -346,9 +338,6 @@ def clean_post_norm(
         post_targets, post_norm_texts = _clean_post_norm_google(
             inputs=inputs, targets=post_targets, norm_texts=post_norm_texts
         )
-
-    else:
-        pass
 
     # --- general pre cleaning ---
 
@@ -450,7 +439,7 @@ def clean_libri_tts(target: str):
     }
 
     # let's normalize `libri_only_remove_dot_abbrs` abbreviations, because google doesn't do it well
-    for abbr in google_abbr2expand.keys():
+    for abbr in google_abbr2expand:
         if abbr in target:
             # replace abbr in google text via regex and using \b to match only whole words, keep original 1 and 2 groups
             target = re.sub(rf'(^|\s|\W){abbr}($|\s)', rf"\1{google_abbr2expand[abbr]}\2", target)
@@ -559,10 +548,7 @@ def contains_month(pred, gt):
         "december",
     ]
 
-    for mon in months:
-        if mon in gt and mon in pred:
-            return True
-    return False
+    return any(mon in gt and mon in pred for mon in months)
 
 
 def is_date(pred, gt, cardinal_graph):

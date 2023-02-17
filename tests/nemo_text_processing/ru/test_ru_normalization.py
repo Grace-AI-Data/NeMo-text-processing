@@ -21,7 +21,7 @@ try:
     from nemo_text_processing.text_normalization.normalize_with_audio import NormalizerWithAudio
 
     PYNINI_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     PYNINI_AVAILABLE = False
 
 
