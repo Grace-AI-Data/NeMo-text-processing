@@ -63,7 +63,7 @@ def rewrite(cardinal: 'pynini.FstLike') -> 'pynini.FstLike':
     new_orthography_sigma = no_spaces
 
     # Old orthography will not have these strings. Replacing with character to mark.
-    targets_for_filtering = ("-" + targets) | ("-" + targets + "-") | (targets + "-")
+    targets_for_filtering = f"-{targets}" | f"-{targets}-" | f"{targets}-"
 
     filter = pynini.cdrewrite(pynini.cross(targets_for_filtering, "#"), "", "", NEMO_SIGMA)  # Invalid for cardinal
 

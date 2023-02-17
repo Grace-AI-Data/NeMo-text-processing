@@ -28,8 +28,7 @@ def _get_month_graph():
     """
     Transducer for month, e.g. march -> march
     """
-    month_graph = pynini.string_file(get_abs_path("data/months.tsv")).optimize()
-    return month_graph
+    return pynini.string_file(get_abs_path("data/months.tsv")).optimize()
 
 
 def _get_ties_graph():
@@ -43,11 +42,13 @@ def _get_ties_graph():
     graph_ten = pynini.cross("mươi", "")
     optional_ten = pynini.closure(delete_space + graph_ten, 0, 1)
 
-    graph = pynini.union(
-        ties_graph + optional_ten + delete_space + (graph_digit | graph_one | graph_four | graph_five),
+    return pynini.union(
+        ties_graph
+        + optional_ten
+        + delete_space
+        + (graph_digit | graph_one | graph_four | graph_five),
         ties_graph + delete_space + graph_ten + pynutil.insert("0"),
     )
-    return graph
 
 
 def _get_year_graph():

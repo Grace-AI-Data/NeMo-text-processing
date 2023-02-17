@@ -285,9 +285,7 @@ class MeasureFst(GraphFst):
 
         states = load_labels(get_abs_path("data/address/state.tsv"))
 
-        additional_options = []
-        for x, y in states:
-            additional_options.append((x, f"{y[0]}.{y[1:]}"))
+        additional_options = [(x, f"{y[0]}.{y[1:]}") for x, y in states]
         states.extend(additional_options)
         state_graph = pynini.string_map(states)
         state = pynini.invert(state_graph)

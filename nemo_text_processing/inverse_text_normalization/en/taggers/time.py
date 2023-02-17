@@ -58,7 +58,7 @@ class TimeFst(GraphFst):
         # only used for < 1000 thousand -> 0 weight
         cardinal = pynutil.add_weight(CardinalFst(input_case=input_case).graph_no_exception, weight=-0.7)
 
-        labels_hour = [num_to_word(x) for x in range(0, 24)]
+        labels_hour = [num_to_word(x) for x in range(24)]
         labels_minute_single = [num_to_word(x) for x in range(1, 10)]
         labels_minute_double = [num_to_word(x) for x in range(10, 60)]
 

@@ -107,10 +107,7 @@ class CardinalFst(GraphFst):
         graph_digit = digit
         digits_no_one = (NEMO_DIGIT - "1") @ graph_digit
         both_ones = pynini.cross("1", "en") | pynini.cross("1", "ett")
-        if deterministic:
-            final_digit = digit
-        else:
-            final_digit = digits_no_one | both_ones
+        final_digit = digit if deterministic else digits_no_one | both_ones
         self.digit = final_digit
 
         single_digits_graph = graph_digit | zero

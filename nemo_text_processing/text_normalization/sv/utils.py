@@ -25,7 +25,7 @@ def get_abs_path(rel_path):
         
     Returns absolute path
     """
-    return os.path.dirname(os.path.abspath(__file__)) + '/' + rel_path
+    return f'{os.path.dirname(os.path.abspath(__file__))}/{rel_path}'
 
 
 def load_labels(abs_path):
@@ -38,5 +38,4 @@ def load_labels(abs_path):
     Returns dictionary of mappings
     """
     with open(abs_path, encoding="utf-8") as label_tsv:
-        labels = list(csv.reader(label_tsv, delimiter="\t"))
-        return labels
+        return list(csv.reader(label_tsv, delimiter="\t"))

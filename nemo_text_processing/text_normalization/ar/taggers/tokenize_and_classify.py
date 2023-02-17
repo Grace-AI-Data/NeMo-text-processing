@@ -70,7 +70,7 @@ class ClassifyFst(GraphFst):
             self.fst_no_digits = pynini.compose(self.fst, no_digits).optimize()
             logging.info(f"ClassifyFst.fst was restored from {far_file}.")
         else:
-            logging.info(f"Creating ClassifyFst grammars. This might take some time...")
+            logging.info("Creating ClassifyFst grammars. This might take some time...")
 
             self.cardinal = CardinalFst()
             cardinal_graph = self.cardinal.fst

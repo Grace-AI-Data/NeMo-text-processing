@@ -155,7 +155,7 @@ def roman_to_int(fst: 'pynini.FstLike') -> 'pynini.FstLike':
 
     def _load_roman(file: str):
         roman = load_labels(get_abs_path(file))
-        roman_numerals = [(x, y) for x, y in roman] + [(x.upper(), y) for x, y in roman]
+        roman_numerals = list(roman) + [(x.upper(), y) for x, y in roman]
         return pynini.string_map(roman_numerals)
 
     digit = _load_roman("data/roman/digit.tsv")

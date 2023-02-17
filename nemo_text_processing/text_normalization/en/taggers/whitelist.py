@@ -140,9 +140,13 @@ def get_formats(input_f, input_case=INPUT_CASED, is_default=True):
     for x, y in multiple_formats:
         if input_case == INPUT_LOWER_CASED:
             x = x.lower()
-        additional_options.append((f"{x}.", y))  # default "dr" -> doctor, this includes period "dr." -> doctor
-        additional_options.append((f"{x[0].upper() + x[1:]}", f"{y[0].upper() + y[1:]}"))  # "Dr" -> Doctor
-        additional_options.append((f"{x[0].upper() + x[1:]}.", f"{y[0].upper() + y[1:]}"))  # "Dr." -> Doctor
+        additional_options.extend(
+            (
+                (f"{x}.", y),
+                (f"{x[0].upper() + x[1:]}", f"{y[0].upper() + y[1:]}"),
+                (f"{x[0].upper() + x[1:]}.", f"{y[0].upper() + y[1:]}"),
+            )
+        )
     multiple_formats.extend(additional_options)
 
     if not is_default:

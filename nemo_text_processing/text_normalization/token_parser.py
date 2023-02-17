@@ -48,12 +48,12 @@ class TokenParser:
 
         Returns list of dictionaries
         """
-        l = list()
+        l = []
         while self.parse_ws():
-            token = self.parse_token()
-            if not token:
+            if token := self.parse_token():
+                l.append(token)
+            else:
                 break
-            l.append(token)
         return l
 
     def parse_token(self) -> Dict[str, Union[str, dict]]:
@@ -139,16 +139,14 @@ class TokenParser:
         Returns parsed string key
         """
         assert self.char not in string.whitespace and self.char != EOS
-        incl_criterium = string.ascii_letters + "_"
+        incl_criterium = f"{string.ascii_letters}_"
         l = []
         while self.char in incl_criterium:
             l.append(self.char)
             if not self.read():
                 raise ValueError()
 
-        if not l:
-            return None
-        return "".join(l)
+        return "".join(l) if l else None
 
     def parse_string_value(self) -> str:
         """
@@ -164,9 +162,7 @@ class TokenParser:
             if not self.read():
                 raise ValueError()
 
-        if not l:
-            return None
-        return "".join(l)
+        return "".join(l) if l else None
 
     def parse_ws(self):
         """

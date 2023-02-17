@@ -55,7 +55,7 @@ class TimeFst(GraphFst):
         # only used for < 1000 thousand -> 0 weight
         cardinal = cardinal.graph
 
-        labels_hour = [str(x) for x in range(0, 24)]
+        labels_hour = [str(x) for x in range(24)]
         labels_minute_single = [str(x) for x in range(1, 10)]
         labels_minute_double = [str(x) for x in range(10, 60)]
 

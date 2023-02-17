@@ -83,7 +83,7 @@ class DateFst(GraphFst):
         year_second_decades |= pynini.cross("00", "hundra")
         decade_num = pynini.union(year_first + year_second_decades, year_second_decades)
         decade_word = pynini.union("tal", "talet", "tals")
-        tals_word = "tals" + pynini.closure(SV_ALPHA, 1)
+        tals_word = f"tals{pynini.closure(SV_ALPHA, 1)}"
         tal_hyphen = pynutil.delete("-")
         if not deterministic:
             tal_hyphen |= pynini.cross("-", " ")

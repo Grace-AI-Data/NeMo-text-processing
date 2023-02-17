@@ -61,13 +61,13 @@ class MeasureFst(GraphFst):
         graph_fraction_masc = fraction.delete_tokens(fraction.graph_masc)
 
         unit_masc = (unit_plural_masc | unit_singular_masc) + pynini.closure(
-            NEMO_WHITE_SPACE + "por" + pynini.closure(NEMO_NOT_QUOTE, 1), 0, 1
+            f"{NEMO_WHITE_SPACE}por{pynini.closure(NEMO_NOT_QUOTE, 1)}", 0, 1
         )
-        unit_masc |= "por" + pynini.closure(NEMO_NOT_QUOTE, 1)
+        unit_masc |= f"por{pynini.closure(NEMO_NOT_QUOTE, 1)}"
         unit_masc = pynutil.delete("units: \"") + (pynini.closure(NEMO_NOT_QUOTE) @ unit_masc) + pynutil.delete("\"")
 
         unit_fem = (unit_plural_fem | unit_singular_fem) + pynini.closure(
-            NEMO_WHITE_SPACE + "por" + pynini.closure(NEMO_NOT_QUOTE, 1), 0, 1
+            f"{NEMO_WHITE_SPACE}por{pynini.closure(NEMO_NOT_QUOTE, 1)}", 0, 1
         )
         unit_fem = pynutil.delete("units: \"") + (pynini.closure(NEMO_NOT_QUOTE) @ unit_fem) + pynutil.delete("\"")
 
@@ -122,7 +122,9 @@ class MeasureFst(GraphFst):
             @ graph
         )  # billones de xyz
 
-        graph @= pynini.cdrewrite(pynini.cross(ones, "uno"), "", NEMO_WHITE_SPACE + "por", NEMO_SIGMA)
+        graph @= pynini.cdrewrite(
+            pynini.cross(ones, "uno"), "", f"{NEMO_WHITE_SPACE}por", NEMO_SIGMA
+        )
 
         # To manage alphanumeric combonations ("a-8, 5x"), we let them use a weighted default path.
         alpha_num_unit = pynutil.delete("units: \"") + pynini.closure(NEMO_NOT_QUOTE) + pynutil.delete("\"")

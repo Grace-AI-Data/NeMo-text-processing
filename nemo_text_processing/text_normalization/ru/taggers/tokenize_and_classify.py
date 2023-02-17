@@ -77,7 +77,7 @@ class ClassifyFst(GraphFst):
             self.fst = pynini.Far(far_file, mode="r")["tokenize_and_classify"]
             logging.info(f"ClassifyFst.fst was restored from {far_file}.")
         else:
-            logging.info(f"Creating ClassifyFst grammars. This might take some time...")
+            logging.info("Creating ClassifyFst grammars. This might take some time...")
             number_names = get_number_names()
             alternative_formats = get_alternative_formats()
 

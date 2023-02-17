@@ -133,12 +133,7 @@ def adjust_boundaries(norm_raw_diffs: Dict, norm_pred_diffs: Dict, raw: str, nor
             raw_start = item[1][0]
             pred_text_start = item[2][0]
             norm_span_start = item[0]
-            raw_end = item[1][1]
-            pred_text_end = item[2][1]
-        elif last_status is not None and last_status == item[1][2]:
-            raw_end = item[1][1]
-            pred_text_end = item[2][1]
-        else:
+        elif last_status != item[1][2]:
             adjusted2.append(
                 [[norm_span_start, item[0]], [raw_start, raw_end], [pred_text_start, pred_text_end], last_status]
             )
@@ -146,9 +141,8 @@ def adjust_boundaries(norm_raw_diffs: Dict, norm_pred_diffs: Dict, raw: str, nor
             raw_start = item[1][0]
             pred_text_start = item[2][0]
             norm_span_start = item[0]
-            raw_end = item[1][1]
-            pred_text_end = item[2][1]
-
+        pred_text_end = item[2][1]
+        raw_end = item[1][1]
     if last_status == item[1][2]:
         raw_end = item[1][1]
         pred_text_end = item[2][1]
@@ -186,7 +180,7 @@ def adjust_boundaries(norm_raw_diffs: Dict, norm_pred_diffs: Dict, raw: str, nor
         # if cur_pred_text is an empty string
         if item[2][0] == item[2][1]:
             # for the last item
-            if idx == len(adjusted2) - 1 and len(adjusted3) > 0:
+            if idx == len(adjusted2) - 1 and adjusted3:
                 last_item = adjusted3[-1]
                 last_item[0][1] = item[0][1]
                 last_item[1][1] = item[1][1]
@@ -196,7 +190,9 @@ def adjust_boundaries(norm_raw_diffs: Dict, norm_pred_diffs: Dict, raw: str, nor
                 raw_start, raw_end = item[0]
                 norm_start, norm_end = item[1]
                 pred_start, pred_end = item[2]
-                while idx < len(adjusted2) - 1 and not ((pred_end - pred_start) > 2 and adjusted2[idx][-1] == MATCH):
+                while idx < len(adjusted2) - 1 and (
+                    pred_end - pred_start <= 2 or adjusted2[idx][-1] != MATCH
+                ):
                     idx += 1
                     raw_end = adjusted2[idx][0][1]
                     norm_end = adjusted2[idx][1][1]
@@ -204,11 +200,9 @@ def adjust_boundaries(norm_raw_diffs: Dict, norm_pred_diffs: Dict, raw: str, nor
                 cur_item = [[raw_start, raw_end], [norm_start, norm_end], [pred_start, pred_end], NONMATCH]
                 adjusted3.append(cur_item)
                 extended_spans.append(len(adjusted3) - 1)
-            idx += 1
         else:
             adjusted3.append(item)
-            idx += 1
-
+        idx += 1
     semiotic_spans = []
     norm_spans = []
     pred_texts = []
@@ -219,9 +213,9 @@ def adjust_boundaries(norm_raw_diffs: Dict, norm_pred_diffs: Dict, raw: str, nor
         cur_norm_span = " ".join(norm_list[item[0][0] : item[0][1]])
 
         if idx == len(adjusted3) - 1:
-            cur_norm_span = " ".join(norm_list[item[0][0] : len(norm_list)])
+            cur_norm_span = " ".join(norm_list[item[0][0]:])
         if (item[-1] == NONMATCH and cur_semiotic != cur_norm_span) or (idx in extended_spans):
-            raw_text_masked += " " + SEMIOTIC_TAG
+            raw_text_masked += f" {SEMIOTIC_TAG}"
             semiotic_spans.append(cur_semiotic)
             pred_texts.append(cur_pred_text)
             norm_spans.append(cur_norm_span)

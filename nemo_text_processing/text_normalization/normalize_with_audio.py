@@ -151,13 +151,14 @@ class NormalizerWithAudio(Normalizer):
                 text=text, verbose=verbose, punct_pre_process=False, punct_post_process=punct_post_process
             )
         except RecursionError:
-            raise RecursionError(f"RecursionError. Try decreasing --max_number_of_permutations_per_split")
+            raise RecursionError(
+                "RecursionError. Try decreasing --max_number_of_permutations_per_split"
+            )
 
         semiotic_spans, pred_text_spans, norm_spans, text_with_span_tags_list, masked_idx_list = get_alignment(
             text, det_norm, pred_text, verbose=False
         )
-        sem_tag_idx = 0
-        for cur_semiotic_span, cur_pred_text, cur_deter_norm in zip(semiotic_spans, pred_text_spans, norm_spans):
+        for sem_tag_idx, (cur_semiotic_span, cur_pred_text, cur_deter_norm) in enumerate(zip(semiotic_spans, pred_text_spans, norm_spans)):
             if len(cur_semiotic_span) == 0:
                 text_with_span_tags_list[masked_idx_list[sem_tag_idx]] = ""
             else:
@@ -170,7 +171,7 @@ class NormalizerWithAudio(Normalizer):
                     )
                     if cer_threshold > 0 and cer > cer_threshold:
                         best_option = cur_deter_norm
-                        if verbose and True:
+                        if verbose:
                             print(
                                 f"CER of the best normalization option is above cer_theshold, using determinictis option. CER: {cer}"
                             )
@@ -179,8 +180,6 @@ class NormalizerWithAudio(Normalizer):
                     best_option = cur_deter_norm
 
                 text_with_span_tags_list[masked_idx_list[sem_tag_idx]] = best_option
-            sem_tag_idx += 1
-
         normalized_text = " ".join(text_with_span_tags_list)
         return normalized_text.replace("  ", " ")
 
@@ -235,16 +234,14 @@ class NormalizerWithAudio(Normalizer):
             for tagged_text in tagged_texts:
                 self._verbalize(tagged_text, normalized_texts, n_tagged, verbose=verbose)
 
-        if len(normalized_texts) == 0:
+        if not normalized_texts:
             raise ValueError()
 
-        if punct_post_process:
-            # do post-processing based on Moses detokenizer
-            if self.moses_detokenizer:
-                normalized_texts = [self.moses_detokenizer.detokenize([t]) for t in normalized_texts]
-                normalized_texts = [
-                    post_process_punct(input=original_text, normalized_text=t) for t in normalized_texts
-                ]
+        if punct_post_process and self.moses_detokenizer:
+            normalized_texts = [self.moses_detokenizer.detokenize([t]) for t in normalized_texts]
+            normalized_texts = [
+                post_process_punct(input=original_text, normalized_text=t) for t in normalized_texts
+            ]
 
         if self.lm:
             remove_dup = sorted(list(set(zip(normalized_texts, weights))), key=lambda x: x[1])
@@ -306,34 +303,30 @@ class NormalizerWithAudio(Normalizer):
             n_tagged: number of tagged options to consider, -1 - return all possible tagged options
         """
         if n_tagged == -1:
-            if self.lang == "en":
-                # this to keep arpabet phonemes in the list of options
-                if "[" in text and "]" in text:
-                    tagged_texts = rewrite.rewrites(text, self.tagger_non_deterministic.fst)
-                else:
-                    try:
-                        tagged_texts = rewrite.rewrites(text, self.tagger_non_deterministic.fst_no_digits)
-                    except pynini.lib.rewrite.Error:
-                        tagged_texts = rewrite.rewrites(text, self.tagger_non_deterministic.fst)
-            else:
+            if (
+                self.lang == "en"
+                and "[" in text
+                and "]" in text
+                or self.lang != "en"
+            ):
                 tagged_texts = rewrite.rewrites(text, self.tagger_non_deterministic.fst)
-        else:
-            if self.lang == "en":
-                # this to keep arpabet phonemes in the list of options
-                if "[" in text and "]" in text:
-                    tagged_texts = rewrite.top_rewrites(text, self.tagger_non_deterministic.fst, nshortest=n_tagged)
-                else:
-                    try:
-                        # try self.tagger graph that produces output without digits
-                        tagged_texts = rewrite.top_rewrites(
-                            text, self.tagger_non_deterministic.fst_no_digits, nshortest=n_tagged
-                        )
-                    except pynini.lib.rewrite.Error:
-                        tagged_texts = rewrite.top_rewrites(
-                            text, self.tagger_non_deterministic.fst, nshortest=n_tagged
-                        )
             else:
-                tagged_texts = rewrite.top_rewrites(text, self.tagger_non_deterministic.fst, nshortest=n_tagged)
+                try:
+                    tagged_texts = rewrite.rewrites(text, self.tagger_non_deterministic.fst_no_digits)
+                except pynini.lib.rewrite.Error:
+                    tagged_texts = rewrite.rewrites(text, self.tagger_non_deterministic.fst)
+        elif self.lang == "en" and "[" in text and "]" in text or self.lang != "en":
+            tagged_texts = rewrite.top_rewrites(text, self.tagger_non_deterministic.fst, nshortest=n_tagged)
+        else:
+            try:
+                # try self.tagger graph that produces output without digits
+                tagged_texts = rewrite.top_rewrites(
+                    text, self.tagger_non_deterministic.fst_no_digits, nshortest=n_tagged
+                )
+            except pynini.lib.rewrite.Error:
+                tagged_texts = rewrite.top_rewrites(
+                    text, self.tagger_non_deterministic.fst, nshortest=n_tagged
+                )
         return tagged_texts
 
     def _verbalize(self, tagged_text: str, normalized_texts: List[str], n_tagged: int, verbose: bool = False):

@@ -95,8 +95,9 @@ def get_number_names():
 
     # Composes L with the leaf transducer (P), then composes that with FG.
     p = a['LEAVES']
-    number_names = {}
-    number_names['ordinal_number_names'] = (fg_ordinal @ (p @ ordinal_l)).optimize()
+    number_names = {
+        'ordinal_number_names': (fg_ordinal @ (p @ ordinal_l)).optimize()
+    }
     number_names['cardinal_number_names'] = (fg @ (p @ cardinal_l)).optimize()
     number_names['cardinal_names_nominative'] = (fg @ (p @ cardinal_names_nominative_l)).optimize()
     return number_names
@@ -124,8 +125,9 @@ def get_alternative_formats():
         | pynutil.add_weight(t['no_delimiter'], -0.1)
         | pynutil.add_weight(t['space_thousands'], 0.1)
     )
-    alternative_formats = {}
-    alternative_formats['one_thousand_alternative'] = one_thousand_alternative.optimize()
+    alternative_formats = {
+        'one_thousand_alternative': one_thousand_alternative.optimize()
+    }
     alternative_formats['separators'] = separators.optimize()
     return alternative_formats
 

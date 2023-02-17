@@ -43,7 +43,7 @@ class DateFst(GraphFst):
             (graph_ties + pynutil.delete(" e ") + graph_digit),
         )
 
-        digits_1_to_31 = [str("{:0>2d}").format(digits) for digits in range(1, 32)]
+        digits_1_to_31 = ["{:0>2d}".format(digits) for digits in range(1, 32)]
         graph_1_to_31 = graph_1_to_100 @ pynini.union(*digits_1_to_31)
         # can use "primeiro" for 1st day of the month
         graph_1_to_31 = pynini.union(graph_1_to_31, pynini.cross("primeiro", "01"))
@@ -54,7 +54,7 @@ class DateFst(GraphFst):
         month_name_graph = pynutil.insert("month: \"") + month_name_graph + pynutil.insert("\"")
 
         # vinte do oito -> 20/08
-        digits_1_to_12 = [str("{:0>2d}").format(digits) for digits in range(1, 13)]
+        digits_1_to_12 = ["{:0>2d}".format(digits) for digits in range(1, 13)]
         graph_1_to_12 = graph_1_to_100 @ pynini.union(*digits_1_to_12)
         month_number_graph = pynutil.insert("month: \"") + graph_1_to_12 + pynutil.insert("\"")
 

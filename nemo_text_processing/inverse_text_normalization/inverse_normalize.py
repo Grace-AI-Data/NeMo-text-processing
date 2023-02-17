@@ -50,53 +50,53 @@ class InverseNormalizer(Normalizer):
         max_number_of_permutations_per_split: int = 729,
     ):
 
-        assert input_case in ["lower_cased", "cased"]
+        assert input_case in {"lower_cased", "cased"}
 
-        if lang == 'en':  # English
-            from nemo_text_processing.inverse_text_normalization.en.taggers.tokenize_and_classify import ClassifyFst
-            from nemo_text_processing.inverse_text_normalization.en.verbalizers.verbalize_final import (
-                VerbalizeFinalFst,
-            )
-
-        elif lang == 'es':  # Spanish (Espanol)
-            from nemo_text_processing.inverse_text_normalization.es.taggers.tokenize_and_classify import ClassifyFst
-            from nemo_text_processing.inverse_text_normalization.es.verbalizers.verbalize_final import (
-                VerbalizeFinalFst,
-            )
-
-        elif lang == 'pt':  # Portuguese (Português)
-            from nemo_text_processing.inverse_text_normalization.pt.taggers.tokenize_and_classify import ClassifyFst
-            from nemo_text_processing.inverse_text_normalization.pt.verbalizers.verbalize_final import (
-                VerbalizeFinalFst,
-            )
-
-        elif lang == 'ru':  # Russian (Russkiy Yazyk)
-            from nemo_text_processing.inverse_text_normalization.ru.taggers.tokenize_and_classify import ClassifyFst
-            from nemo_text_processing.inverse_text_normalization.ru.verbalizers.verbalize_final import (
-                VerbalizeFinalFst,
-            )
-
-        elif lang == 'de':  # German (Deutsch)
-            from nemo_text_processing.inverse_text_normalization.de.taggers.tokenize_and_classify import ClassifyFst
-            from nemo_text_processing.inverse_text_normalization.de.verbalizers.verbalize_final import (
-                VerbalizeFinalFst,
-            )
-        elif lang == 'fr':  # French (Français)
-            from nemo_text_processing.inverse_text_normalization.fr.taggers.tokenize_and_classify import ClassifyFst
-            from nemo_text_processing.inverse_text_normalization.fr.verbalizers.verbalize_final import (
-                VerbalizeFinalFst,
-            )
-        elif lang == 'vi':  # Vietnamese (Tiếng Việt)
-            from nemo_text_processing.inverse_text_normalization.vi.taggers.tokenize_and_classify import ClassifyFst
-            from nemo_text_processing.inverse_text_normalization.vi.verbalizers.verbalize_final import (
-                VerbalizeFinalFst,
-            )
-        elif lang == 'ar':  # Arabic
+        if lang == 'ar':
             from nemo_text_processing.inverse_text_normalization.ar.taggers.tokenize_and_classify import ClassifyFst
             from nemo_text_processing.inverse_text_normalization.ar.verbalizers.verbalize_final import (
                 VerbalizeFinalFst,
             )
 
+        elif lang == 'de':
+            from nemo_text_processing.inverse_text_normalization.de.taggers.tokenize_and_classify import ClassifyFst
+            from nemo_text_processing.inverse_text_normalization.de.verbalizers.verbalize_final import (
+                VerbalizeFinalFst,
+            )
+        elif lang == 'en':
+            from nemo_text_processing.inverse_text_normalization.en.taggers.tokenize_and_classify import ClassifyFst
+            from nemo_text_processing.inverse_text_normalization.en.verbalizers.verbalize_final import (
+                VerbalizeFinalFst,
+            )
+
+        elif lang == 'es':
+            from nemo_text_processing.inverse_text_normalization.es.taggers.tokenize_and_classify import ClassifyFst
+            from nemo_text_processing.inverse_text_normalization.es.verbalizers.verbalize_final import (
+                VerbalizeFinalFst,
+            )
+
+        elif lang == 'fr':
+            from nemo_text_processing.inverse_text_normalization.fr.taggers.tokenize_and_classify import ClassifyFst
+            from nemo_text_processing.inverse_text_normalization.fr.verbalizers.verbalize_final import (
+                VerbalizeFinalFst,
+            )
+        elif lang == 'pt':
+            from nemo_text_processing.inverse_text_normalization.pt.taggers.tokenize_and_classify import ClassifyFst
+            from nemo_text_processing.inverse_text_normalization.pt.verbalizers.verbalize_final import (
+                VerbalizeFinalFst,
+            )
+
+        elif lang == 'ru':
+            from nemo_text_processing.inverse_text_normalization.ru.taggers.tokenize_and_classify import ClassifyFst
+            from nemo_text_processing.inverse_text_normalization.ru.verbalizers.verbalize_final import (
+                VerbalizeFinalFst,
+            )
+
+        elif lang == 'vi':
+            from nemo_text_processing.inverse_text_normalization.vi.taggers.tokenize_and_classify import ClassifyFst
+            from nemo_text_processing.inverse_text_normalization.vi.verbalizers.verbalize_final import (
+                VerbalizeFinalFst,
+            )
         self.tagger = ClassifyFst(
             cache_dir=cache_dir, whitelist=whitelist, overwrite_cache=overwrite_cache, input_case=input_case
         )
@@ -182,10 +182,10 @@ if __name__ == "__main__":
     if args.input_string:
         print(inverse_normalizer.inverse_normalize(args.input_string, verbose=args.verbose))
     elif args.input_file:
-        print("Loading data: " + args.input_file)
+        print(f"Loading data: {args.input_file}")
         data = load_file(args.input_file)
 
-        print("- Data: " + str(len(data)) + " sentences")
+        print(f"- Data: {len(data)} sentences")
         prediction = inverse_normalizer.inverse_normalize_list(data, verbose=args.verbose)
         if args.output_file:
             write_file(args.output_file, prediction)

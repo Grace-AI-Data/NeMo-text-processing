@@ -56,11 +56,10 @@ def get_ties_digit(digit_path: str, tie_path: str) -> 'pynini.FstLike':
 
         for di in digits[s[1]]:
             for ti in ties[s[0]]:
-                word = di + f" {AND} " + ti
+                word = f"{di} {AND} {ti}"
                 d.append((word, s))
 
-    res = pynini.string_map(d)
-    return res
+    return pynini.string_map(d)
 
 
 class CardinalFst(GraphFst):

@@ -76,8 +76,7 @@ class Filter:
 
 
 def filter_cardinal_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_cardinal_1(instance: Instance) -> Instance:
@@ -89,8 +88,7 @@ def process_cardinal_1(instance: Instance) -> Instance:
 
 
 def filter_ordinal_1(instance: Instance) -> bool:
-    ok = re.search(r"(st|nd|rd|th)\s*$", instance.un_normalized)
-    return ok
+    return re.search(r"(st|nd|rd|th)\s*$", instance.un_normalized)
 
 
 def process_ordinal_1(instance: Instance) -> Instance:
@@ -102,8 +100,7 @@ def process_ordinal_1(instance: Instance) -> Instance:
 
 
 def filter_decimal_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_decimal_1(instance: Instance) -> Instance:
@@ -115,8 +112,7 @@ def process_decimal_1(instance: Instance) -> Instance:
 
 
 def filter_measure_1(instance: Instance) -> bool:
-    ok = True
-    return ok
+    return True
 
 
 def process_measure_1(instance: Instance) -> Instance:
@@ -132,8 +128,7 @@ def process_measure_1(instance: Instance) -> Instance:
 
 
 def filter_money_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_money_1(instance: Instance) -> Instance:
@@ -149,8 +144,7 @@ def process_money_1(instance: Instance) -> Instance:
 
 
 def filter_time_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_time_1(instance: Instance) -> Instance:
@@ -164,8 +158,7 @@ def process_time_1(instance: Instance) -> Instance:
 
 
 def filter_plain_1(instance: Instance) -> bool:
-    ok = True
-    return ok
+    return True
 
 
 def process_plain_1(instance: Instance) -> Instance:
@@ -175,8 +168,7 @@ def process_plain_1(instance: Instance) -> Instance:
 
 
 def filter_punct_1(instance: Instance) -> bool:
-    ok = True
-    return ok
+    return True
 
 
 def process_punct_1(instance: Instance) -> Instance:
@@ -186,8 +178,7 @@ def process_punct_1(instance: Instance) -> Instance:
 
 
 def filter_date_1(instance: Instance) -> bool:
-    ok = True
-    return ok
+    return True
 
 
 def process_date_1(instance: Instance) -> Instance:
@@ -199,8 +190,7 @@ def process_date_1(instance: Instance) -> Instance:
 
 
 def filter_letters_1(instance: Instance) -> bool:
-    ok = True
-    return ok
+    return True
 
 
 def process_letters_1(instance: Instance) -> Instance:
@@ -211,8 +201,7 @@ def process_letters_1(instance: Instance) -> Instance:
 
 
 def filter_verbatim_1(instance: Instance) -> bool:
-    ok = True
-    return ok
+    return True
 
 
 def process_verbatim_1(instance: Instance) -> Instance:
@@ -222,8 +211,7 @@ def process_verbatim_1(instance: Instance) -> Instance:
 
 
 def filter_digit_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_digit_1(instance: Instance) -> Instance:
@@ -234,8 +222,7 @@ def process_digit_1(instance: Instance) -> Instance:
 
 
 def filter_telephone_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_telephone_1(instance: Instance) -> Instance:
@@ -246,8 +233,7 @@ def process_telephone_1(instance: Instance) -> Instance:
 
 
 def filter_electronic_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_electronic_1(instance: Instance) -> Instance:
@@ -258,8 +244,7 @@ def process_electronic_1(instance: Instance) -> Instance:
 
 
 def filter_fraction_1(instance: Instance) -> bool:
-    ok = re.search(r"[0-9]", instance.un_normalized)
-    return ok
+    return re.search(r"[0-9]", instance.un_normalized)
 
 
 def process_fraction_1(instance: Instance) -> Instance:
@@ -270,8 +255,7 @@ def process_fraction_1(instance: Instance) -> Instance:
 
 
 def filter_address_1(instance: Instance) -> bool:
-    ok = True
-    return ok
+    return True
 
 
 def process_address_1(instance: Instance) -> Instance:
@@ -281,8 +265,13 @@ def process_address_1(instance: Instance) -> Instance:
     return Instance(token_type=instance.token_type, un_normalized=un_normalized, normalized=normalized)
 
 
-filters = []
-filters.append(Filter(class_type="CARDINAL", process_func=process_cardinal_1, filter_func=filter_cardinal_1))
+filters = [
+    Filter(
+        class_type="CARDINAL",
+        process_func=process_cardinal_1,
+        filter_func=filter_cardinal_1,
+    )
+]
 filters.append(Filter(class_type="ORDINAL", process_func=process_ordinal_1, filter_func=filter_ordinal_1))
 filters.append(Filter(class_type="DECIMAL", process_func=process_decimal_1, filter_func=filter_decimal_1))
 filters.append(Filter(class_type="MEASURE", process_func=process_measure_1, filter_func=filter_measure_1))
@@ -336,7 +325,7 @@ if __name__ == "__main__":
     args = parse_args()
     file_path = args.input
 
-    print("Loading training data: " + file_path)
+    print(f"Loading training data: {file_path}")
     instance_list = load_files([file_path])  # List of instances
     filtered_instance_list = filter_loaded_data(instance_list, args.verbose)
     training_data_to_sentences(filtered_instance_list)

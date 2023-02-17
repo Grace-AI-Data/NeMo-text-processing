@@ -46,8 +46,8 @@ class Date(GraphFst):
 
         year_2_4_digit = pynini.closure(NEMO_DIGIT, 2, 4) + delete_date_sign
         year_4_digit = pynini.closure(NEMO_DIGIT, 4, 4) + delete_date_sign
-        year_2_digit_with_zero = "0" + NEMO_DIGIT + delete_date_sign
-        month_no_day_with_zero = "0" + NEMO_DIGIT
+        year_2_digit_with_zero = f"0{NEMO_DIGIT}{delete_date_sign}"
+        month_no_day_with_zero = f"0{NEMO_DIGIT}"
         month_no_day = pynini.closure(NEMO_DIGIT, 2, 2)
         month = pynini.closure(NEMO_DIGIT, 1, 2) + delete_date_sign
         day = pynini.closure(NEMO_DIGIT, 1, 2)

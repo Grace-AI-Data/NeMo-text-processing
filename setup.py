@@ -17,6 +17,7 @@
 
 """Setup for pip package."""
 
+
 import codecs
 import importlib.util
 import os
@@ -57,7 +58,7 @@ elif os.path.exists('README.rst'):
     long_description_content_type = "text/x-rst"
 
 else:
-    long_description = 'See ' + __homepage__
+    long_description = f'See {__homepage__}'
 
 
 ###############################################################################
@@ -125,12 +126,10 @@ class StyleCommand(distutils_cmd.Command):
             command.extend(['--check', '--diff'])
 
         self.announce(
-            msg='Running command: %s' % str(' '.join(command)), level=distutils_log.INFO,
+            msg=f"Running command: {' '.join(command)}", level=distutils_log.INFO
         )
 
-        return_code = subprocess.call(command)
-
-        return return_code
+        return subprocess.call(command)
 
     def _isort(self, scope, check):
         return self.__call_checker(base_command=self.__ISORT_BASE.split(), scope=scope, check=check,)

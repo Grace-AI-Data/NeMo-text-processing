@@ -22,7 +22,7 @@ try:
     import pynini
 
     PYNINI_AVAILABLE = True
-except (ModuleNotFoundError, ImportError):
+except ImportError:
     logging.warning(
         "`pynini` is not installed ! \n"
         "Please run the `nemo_text_processing/setup.sh` script"

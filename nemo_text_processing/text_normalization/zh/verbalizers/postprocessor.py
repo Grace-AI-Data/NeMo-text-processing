@@ -45,11 +45,17 @@ class PostProcessor(GraphFst):
             graph @= pynini.cdrewrite(remove_puncts_graph, "", "", NEMO_SIGMA).optimize()
 
         if to_upper or to_lower:
-            if to_upper:
-                conv_cases_graph = pynini.inverse(pynini.string_file(get_abs_path('data/char/upper_to_lower.tsv')))
-            else:
-                conv_cases_graph = pynini.string_file(get_abs_path('data/char/upper_to_lower.tsv'))
-
+            conv_cases_graph = (
+                pynini.inverse(
+                    pynini.string_file(
+                        get_abs_path('data/char/upper_to_lower.tsv')
+                    )
+                )
+                if to_upper
+                else pynini.string_file(
+                    get_abs_path('data/char/upper_to_lower.tsv')
+                )
+            )
             graph @= pynini.cdrewrite(conv_cases_graph, "", "", NEMO_SIGMA).optimize()
 
         if tag_oov:

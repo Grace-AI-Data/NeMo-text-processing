@@ -37,12 +37,7 @@ class RomanFst(GraphFst):
         default_graph = pynutil.insert("integer: \"") + default_graph + pynutil.insert("\"")
         ordinal_limit = 19
 
-        if deterministic:
-            # exclude "I"
-            start_idx = 1
-        else:
-            start_idx = 0
-
+        start_idx = 1 if deterministic else 0
         graph_teens = pynini.string_map([x[0] for x in roman_dict[start_idx:ordinal_limit]]).optimize()
 
         # roman numerals up to ordinal_limit with a preceding name are converted to ordinal form
@@ -58,10 +53,13 @@ class RomanFst(GraphFst):
         # single symbol roman numerals with preceding key words (multiple formats) are converted to cardinal form
         key_words = []
         for k_word in load_labels(get_abs_path("data/roman/key_word.tsv")):
-            key_words.append(k_word)
-            key_words.append([k_word[0][0].upper() + k_word[0][1:]])
-            key_words.append([k_word[0].upper()])
-
+            key_words.extend(
+                (
+                    k_word,
+                    [k_word[0][0].upper() + k_word[0][1:]],
+                    [k_word[0].upper()],
+                )
+            )
         key_words = pynini.string_map(key_words).optimize()
         graph |= (
             pynutil.insert("key_cardinal: \"") + key_words + pynutil.insert("\"") + pynini.accep(" ") + default_graph
@@ -76,8 +74,7 @@ class RomanFst(GraphFst):
                     + (pynini.string_map([x[0] for x in roman_dict[:50]]).optimize()) @ default_graph
                 ),
             )
-            graph |= roman_to_cardinal
-        elif not lm:
+        else:
             # two or more digit roman numerals
             roman_to_cardinal = pynini.compose(
                 pynini.difference(NEMO_SIGMA, "I"),
@@ -87,8 +84,7 @@ class RomanFst(GraphFst):
                     + pynutil.insert("\"")
                 ),
             ).optimize()
-            graph |= roman_to_cardinal
-
+        graph |= roman_to_cardinal
         # convert three digit roman or up with suffix to ordinal
         roman_to_ordinal = pynini.compose(
             pynini.closure(NEMO_ALPHA, 3),

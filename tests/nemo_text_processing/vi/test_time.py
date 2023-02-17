@@ -21,7 +21,7 @@ try:
     from nemo_text_processing.inverse_text_normalization.inverse_normalize import InverseNormalizer
 
     PYNINI_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     PYNINI_AVAILABLE = False
 
 
